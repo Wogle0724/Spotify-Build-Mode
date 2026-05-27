@@ -1,0 +1,151 @@
+.addsheet-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  animation: addsheet-fade 0.18s ease;
+}
+
+@keyframes addsheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.addsheet {
+  position: relative;
+  width: 100%;
+  background: #1c1c1c;
+  border-radius: 18px 18px 0 0;
+  padding: 10px 16px calc(16px + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-float);
+  animation: addsheet-up 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes addsheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.addsheet-grip {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-card-hover);
+  margin: 2px auto 14px;
+}
+
+.addsheet-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.addsheet-head-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.addsheet-added {
+  font-size: 15px;
+  font-weight: 800;
+}
+.addsheet-song {
+  font-size: 13px;
+  color: var(--text-subdued);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.addsheet-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.addsheet-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 4px;
+  text-align: left;
+  width: 100%;
+}
+.addsheet-row:active {
+  background: var(--tint-07);
+  border-radius: var(--r-sm);
+}
+.addsheet-row-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  display: grid;
+  place-items: center;
+}
+.addsheet-row-icon.liked {
+  background: linear-gradient(135deg, #4500c5, #8a4bff);
+  color: #fff;
+}
+.addsheet-row-name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.addsheet-row-tag {
+  color: var(--green-bright);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.addsheet-toggle {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--text-subdued);
+  color: var(--text-subdued);
+}
+.addsheet-toggle.is-on {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--text-on-green);
+}
+
+.addsheet-done {
+  width: 100%;
+  margin-top: 14px;
+  padding: 13px;
+  border-radius: var(--r-pill);
+  background: var(--text-base);
+  color: var(--black-true);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.addsheet-countdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: transparent;
+  overflow: hidden;
+  border-radius: 0 0 0 0;
+}
+.addsheet-countdown-fill {
+  height: 100%;
+  background: var(--green);
+  transform-origin: left;
+  animation: addsheet-countdown 5s linear forwards;
+}
+@keyframes addsheet-countdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}

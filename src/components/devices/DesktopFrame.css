@@ -1,0 +1,44 @@
+.desktop-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.desktop-frame {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-base);
+  box-shadow:
+    var(--shadow-float),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.desktop-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  background: #0d0d0d;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.desktop-titlebar .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.dot-red {
+  background: #ff5f57;
+}
+.dot-yellow {
+  background: #febc2e;
+}
+.dot-green {
+  background: #28c840;
+}
+
+.desktop-screen {
+  position: relative;
+  overflow: hidden;
+}

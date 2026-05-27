@@ -1,0 +1,57 @@
+.demo-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: radial-gradient(120% 120% at 50% 0%, #1a1a1a 0%, var(--black-true) 70%);
+  display: flex;
+  flex-direction: column;
+  animation: demo-fade 0.25s ease;
+}
+
+@keyframes demo-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.demo-overlay-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.demo-back {
+  font-weight: 700;
+  font-size: 15px;
+  padding: 8px 14px;
+  border-radius: var(--r-pill);
+  background: var(--tint-10);
+  color: var(--text-base);
+}
+.demo-back:hover {
+  background: var(--bg-card-hover);
+}
+.demo-overlay-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+.demo-overlay-note {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--green-bright);
+}
+
+.demo-overlay-stage {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  min-height: 0;
+}
