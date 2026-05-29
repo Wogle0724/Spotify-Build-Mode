@@ -20,6 +20,12 @@ import {
   PlayIcon,
   PauseIcon,
   RepeatIcon,
+  ShareIcon,
+  ConnectIcon,
+  QueueIcon,
+  ChevronRightIcon,
+  ChevronDownIcon,
+  HeartIcon,
 } from '../../icons'
 import { AddSheet } from './AddSheet'
 import './BuildMode.css'
@@ -31,6 +37,8 @@ interface BuildModeProps {
   onTogglePlaylist: (songId: string, playlistId: string) => void
   onToggleLiked: (songId: string) => void
   onExit: () => void
+  /** Autoplay demo: show Voice mode as "on" but never start the real mic. */
+  disableMic?: boolean
 }
 
 type Step = 'mode' | 'building' | 'done'
@@ -52,6 +60,7 @@ export function BuildMode({
   onTogglePlaylist,
   onToggleLiked,
   onExit,
+  disableMic = false,
 }: BuildModeProps) {
   const target = playlists.find((p) => p.id === targetPlaylistId)
 
@@ -60,10 +69,19 @@ export function BuildMode({
   const [queue, setQueue] = useState<Song[]>([])
   const [index, setIndex] = useState(0)
   const [sheetOpen, setSheetOpen] = useState(false)
+  // Auto-dismiss timer only when the sheet pops up after accepting a recommendation.
+  // When the user taps the save (＋/✓) button on the play screen, the sheet stays
+  // open until they explicitly close it.
+  const [sheetAutoDismiss, setSheetAutoDismiss] = useState(true)
   const [voiceOn, setVoiceOn] = useState(false)
   const [phase, setPhase] = useState<Phase>('deciding')
   const [paused, setPaused] = useState(false)
   const [elapsed, setElapsed] = useState(0)
+  // Spotify transport toggles. Shuffle defaults to on (matches the reference
+  // Now Playing screenshot — also the more visually interesting state since
+  // it shows the green underdot affordance).
+  const [shuffleOn, setShuffleOn] = useState(true)
+  const [repeatOn, setRepeatOn] = useState(false)
   const [exitConfirm, setExitConfirm] = useState(false)
   // Target's songs at session start, so we can report just what was added.
   const [initialTargetIds, setInitialTargetIds] = useState<string[]>([])
@@ -107,6 +125,13 @@ export function BuildMode({
   function accept() {
     if (!current) return
     onTogglePlaylist(current.id, targetPlaylistId) // add to target playlist
+    setSheetAutoDismiss(true)
+    setSheetOpen(true)
+  }
+
+  /** Open the add sheet from the play screen's save button — no countdown. */
+  function openAddSheetManual() {
+    setSheetAutoDismiss(false)
     setSheetOpen(true)
   }
 
@@ -143,7 +168,8 @@ export function BuildMode({
   }, [elapsed])
 
   // Voice stays armed during the building step; behavior depends on phase.
-  const speech = useSpeechCommands(voiceOn && step === 'building', (cmd) => {
+  // In the autoplay demo we never start the real mic (disableMic).
+  const speech = useSpeechCommands(voiceOn && step === 'building' && !disableMic, (cmd) => {
     if (sheetOpen) {
       dismissSheet()
       return
@@ -151,7 +177,7 @@ export function BuildMode({
     if (phase === 'deciding') {
       cmd === 'add' ? accept() : reject()
     } else {
-      cmd === 'skip' ? nextPick() : setSheetOpen(true)
+      cmd === 'skip' ? nextPick() : openAddSheetManual()
     }
   })
 
@@ -185,9 +211,9 @@ export function BuildMode({
     <div className="bm">
       <Header
         target={target}
-        modeLabel={BUILD_MODES.find((m) => m.type === mode)?.title ?? ''}
         addedCount={addedSongs.length}
         onExit={requestExit}
+        phase={phase}
       />
 
       {current && (
@@ -199,7 +225,12 @@ export function BuildMode({
             </div>
           </div>
 
-          {/* Title/artist left-aligned with the add control on the right. */}
+          {/* Title/artist left-aligned. In `playing` the right edge holds a
+              single save-to-library affordance: outlined ＋ when the song
+              isn't in the target playlist yet, filled green ✓ circle once
+              added (matches Spotify Now Playing's saved state — screenshot 2).
+              Tapping the ✓ opens the add sheet so the user can fan the song
+              out into more playlists. */}
           <div className="bm-songbar">
             <div className="bm-songmeta">
               <h2 className="bm-title">{current.title}</h2>
@@ -210,11 +241,12 @@ export function BuildMode({
             </div>
             {phase === 'playing' && (
               <button
-                className={`bm-addmore${inTarget ? ' is-added' : ''}`}
-                onClick={() => setSheetOpen(true)}
-                aria-label="Add to more playlists"
+                className={`bm-savebtn${inTarget ? ' is-added' : ''}`}
+                onClick={openAddSheetManual}
+                aria-label={inTarget ? 'In your playlist — add to more' : 'Add to playlist'}
+                aria-pressed={inTarget}
               >
-                {inTarget ? <CheckIcon size={22} /> : <PlusIcon size={26} />}
+                <HeartIcon size={20} />
               </button>
             )}
           </div>
@@ -232,25 +264,53 @@ export function BuildMode({
       {/* Controls swap by phase; everything above stays put. */}
       {phase === 'deciding' ? (
         <div className="bm-actions">
-          <button className="bm-btn bm-reject" onClick={reject} aria-label="Skip this song">
+          <button className="bm-btn bm-reject" onClick={reject} aria-label="Skip this song" data-demo="bm-reject">
             <CloseIcon size={48} />
             <span>Skip</span>
           </button>
-          <button className="bm-btn bm-add" onClick={accept} aria-label="Add this song">
+          <button className="bm-btn bm-add" onClick={accept} aria-label="Add this song" data-demo="bm-add">
             <PlusIcon size={48} />
             <span>Add</span>
           </button>
         </div>
       ) : (
-        <div className="bm-transport">
-          <button className="bm-iconbtn" aria-label="Shuffle"><ShuffleIcon size={22} /></button>
-          <button className="bm-iconbtn" aria-label="Previous" disabled><PrevIcon size={28} /></button>
-          <button className="bm-playpause" onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play' : 'Pause'}>
-            {paused ? <PlayIcon size={26} /> : <PauseIcon size={26} />}
-          </button>
-          <button className="bm-iconbtn" onClick={nextPick} aria-label="Next"><NextIcon size={28} /></button>
-          <button className="bm-iconbtn" aria-label="Repeat"><RepeatIcon size={22} /></button>
-        </div>
+        <>
+          <div className="bm-transport">
+            <button
+              className={`bm-iconbtn bm-toggle${shuffleOn ? ' is-on' : ''}`}
+              onClick={() => setShuffleOn((v) => !v)}
+              aria-label="Shuffle"
+              aria-pressed={shuffleOn}
+            >
+              <ShuffleIcon size={22} />
+            </button>
+            <button className="bm-iconbtn" aria-label="Previous" disabled><PrevIcon size={28} /></button>
+            <button className="bm-playpause" onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play' : 'Pause'}>
+              {paused ? <PlayIcon size={26} /> : <PauseIcon size={26} />}
+            </button>
+            <button className="bm-iconbtn" onClick={nextPick} aria-label="Next" data-demo="bm-next"><NextIcon size={28} /></button>
+            <button
+              className={`bm-iconbtn bm-toggle${repeatOn ? ' is-on' : ''}`}
+              onClick={() => setRepeatOn((v) => !v)}
+              aria-label="Repeat"
+              aria-pressed={repeatOn}
+            >
+              <RepeatIcon size={22} />
+            </button>
+          </div>
+          {/* Connect indicator (left) + Share + Queue (right). Matches the
+              row Spotify shows under the transport in Now Playing. */}
+          <div className="bm-belowtransport">
+            <span className="bm-connect" aria-label="Listening on this iPhone">
+              <ConnectIcon size={14} />
+              Listening on iPhone
+            </span>
+            <div className="bm-belowtransport-icons">
+              <button className="bm-iconbtn bm-iconbtn--sm" aria-label="Share"><ShareIcon size={20} /></button>
+              <button className="bm-iconbtn bm-iconbtn--sm" aria-label="View queue"><QueueIcon size={20} /></button>
+            </div>
+          </div>
+        </>
       )}
 
       <VoicePanel
@@ -261,6 +321,7 @@ export function BuildMode({
         error={speech.error}
         transcript={speech.transcript}
         phase={phase}
+        demo={disableMic}
         onSimulate={(cmd) =>
           phase === 'deciding'
             ? cmd === 'add'
@@ -268,7 +329,7 @@ export function BuildMode({
               : reject()
             : cmd === 'skip'
               ? nextPick()
-              : setSheetOpen(true)
+              : openAddSheetManual()
         }
       />
 
@@ -281,6 +342,7 @@ export function BuildMode({
           onTogglePlaylist={(pid) => onTogglePlaylist(current.id, pid)}
           onToggleLiked={() => onToggleLiked(current.id)}
           onClose={dismissSheet}
+          autoDismiss={sheetAutoDismiss}
         />
       )}
 
@@ -304,22 +366,26 @@ export function BuildMode({
 
 function Header({
   target,
-  modeLabel,
   addedCount,
   onExit,
+  phase,
 }: {
   target?: Playlist
-  modeLabel: string
   addedCount: number
   onExit: () => void
+  phase?: Phase
 }) {
   return (
     <header className="bm-header">
-      <button className="bm-header-btn" onClick={onExit} aria-label="Exit Build Mode">
-        <CloseIcon size={22} />
+      <button
+        className="bm-header-btn"
+        onClick={onExit}
+        aria-label="Exit Build Mode"
+      >
+        {phase === 'playing' ? <ChevronDownIcon size={22} /> : <CloseIcon size={22} />}
       </button>
       <div className="bm-header-center">
-        <span className="bm-header-eyebrow">Build Mode · {modeLabel}</span>
+        <span className="bm-header-eyebrow">Build Mode</span>
         <span className="bm-name">{target?.name ?? 'Playlist'}</span>
       </div>
       <span className="bm-added-chip">{addedCount} added</span>
@@ -358,9 +424,13 @@ function ModeSelect({
 
       <div className="bm-mode-list">
         {BUILD_MODES.map((m) => (
-          <button key={m.type} className="bm-mode-card" onClick={() => onPick(m.type)}>
-            <span className="bm-mode-title">{m.title}</span>
-            <span className="bm-mode-blurb">{m.blurb}</span>
+          <button key={m.type} className="bm-mode-card" onClick={() => onPick(m.type)} data-demo={`mode-${m.type}`}>
+            <span className={`bm-mode-icon bm-mode-icon--${m.type}`} aria-hidden />
+            <span className="bm-mode-text">
+              <span className="bm-mode-title">{m.title}</span>
+              <span className="bm-mode-blurb">{m.blurb}</span>
+            </span>
+            <ChevronRightIcon size={20} />
           </button>
         ))}
       </div>
@@ -451,6 +521,7 @@ function VoicePanel({
   error,
   transcript,
   phase,
+  demo,
   onSimulate,
 }: {
   voiceOn: boolean
@@ -460,15 +531,17 @@ function VoicePanel({
   error: string | null
   transcript: string
   phase: Phase
+  /** Autoplay demo: present the "listening" state without a real mic. */
+  demo: boolean
   onSimulate: (cmd: 'add' | 'skip') => void
 }) {
-  const realActive = voiceOn && supported && !error
+  const realActive = voiceOn && (demo || (supported && !error))
   return (
     <div className={`bm-voice${voiceOn ? ' is-on' : ''}`}>
-      <button className="bm-voice-toggle" onClick={onToggle}>
+      <button className="bm-voice-toggle" onClick={onToggle} data-demo="bm-voice-toggle">
         <MicIcon size={18} />
         {voiceOn ? 'Voice on' : 'Voice mode'}
-        {voiceOn && realActive && listening && <span className="bm-voice-dot" />}
+        {voiceOn && realActive && (listening || demo) && <span className="bm-voice-dot" />}
       </button>
 
       {voiceOn && (

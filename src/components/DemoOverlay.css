@@ -21,7 +21,9 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 16px 20px;
+  padding: 0 24px;
+  height: 72px;
+  flex-shrink: 0;
   border-bottom: 1px solid var(--border-subtle);
 }
 .demo-back {
@@ -39,13 +41,11 @@
   font-weight: 800;
   font-size: 16px;
 }
-.demo-overlay-note {
+.demo-overlay-links {
   margin-left: auto;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--green-bright);
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .demo-overlay-stage {

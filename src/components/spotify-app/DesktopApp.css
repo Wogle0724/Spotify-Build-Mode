@@ -1,4 +1,5 @@
 .dapp {
+  position: relative;       /* anchor for Build Mode modals + the floating discover pill */
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -82,6 +83,7 @@
   padding: 0 8px;
 }
 .dapp-playlist-row {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -90,6 +92,39 @@
   cursor: pointer;
 }
 .dapp-playlist-row:hover {
+  background: var(--tint-10);
+}
+.dapp-playlist-row.is-open {
+  background: var(--tint-07);
+}
+.dapp-playlist-row.is-target {
+  outline: 1px solid var(--green-bright);
+  outline-offset: -1px;
+}
+.dapp-playlist-targetdot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-bright);
+}
+
+.dapp-build-exit {
+  margin: 8px 4px 0;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--tint-07);
+  color: var(--text-base);
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.dapp-build-exit:hover {
   background: var(--tint-10);
 }
 .dapp-playlist-meta {
@@ -114,7 +149,7 @@
   min-width: 0;
   overflow-y: auto;
   border-radius: var(--r-md);
-  background: linear-gradient(180deg, #2b3a4a 0%, var(--bg-base) 280px);
+  background: linear-gradient(180deg, #3a2a1e 0%, var(--bg-base) 280px);
   padding: 0 24px 24px;
 }
 .dapp-topbar {
@@ -147,6 +182,66 @@
   height: 32px;
   border-radius: 50%;
   background: var(--c-mauve);
+}
+
+.dapp-greeting {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 16px 0 14px;
+}
+
+/* Quick-access 2-row grid — "Good afternoon" cards with play button on hover */
+.dapp-quickgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.dapp-quickcard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-elevated);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  height: 64px;
+  padding-right: 10px;
+  text-align: left;
+  transition: background 0.15s;
+}
+.dapp-quickcard:hover {
+  background: var(--bg-card);
+}
+.dapp-quickcard-art {
+  flex-shrink: 0;
+  /* overflow:hidden on parent clips the artwork's right corners */
+}
+.dapp-quickcard-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dapp-quickcard-play {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--green);
+  color: var(--text-on-green);
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: scale(0.85);
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: var(--shadow-card);
+}
+.dapp-quickcard:hover .dapp-quickcard-play {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .dapp-section {
@@ -268,8 +363,510 @@
   color: var(--text-subdued);
 }
 
+/* Selectable-mode rows (browse-mode build session). */
+.dapp-tracktable--select .dapp-track {
+  cursor: pointer;
+}
+.dapp-tracktable--select .dapp-track.is-selectable:hover {
+  background: var(--tint-10);
+}
+.dapp-tracktable--select .dapp-track.is-checked {
+  background: rgba(29, 185, 84, 0.10);
+}
+.dapp-tracktable--select .dapp-track.is-checked:hover {
+  background: rgba(29, 185, 84, 0.16);
+}
+.dapp-check {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  background: transparent;
+  outline: 1.5px solid var(--text-subdued);
+  outline-offset: -1.5px;
+  color: var(--text-on-green);
+}
+.dapp-check.is-checked {
+  background: var(--green-bright);
+  outline-color: var(--green-bright);
+}
+
+/* Search view */
+.dapp-topbar--search {
+  gap: 16px;
+}
+.dapp-searchbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--bg-elevated);
+  border-radius: var(--r-pill);
+  flex: 1;
+  max-width: 380px;
+  color: var(--text-subdued);
+}
+.dapp-searchbar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-base);
+  font: inherit;
+}
+.dapp-searchbar input::placeholder {
+  color: var(--text-muted);
+}
+.dapp-search-empty {
+  color: var(--text-subdued);
+  font-size: 13px;
+}
+
+/* ---- Playlist detail (Spotify-faithful) ----
+ * Hero: large gradient bleed with cover on the left + (eyebrow, name, owner
+ * line). Below that a sticky-ish toolbar with the big green play, then the
+ * transparent icon row (shuffle / + / ↓ / ⋯) on the left and view controls
+ * on the right. Track table renders directly under the toolbar.
+ */
+.dapp-pl {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -24px;            /* bleed under the .dapp-main padding */
+}
+.dapp-pl-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 56px 32px 24px;
+}
+.dapp-pl-back {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--text-base);
+  display: grid;
+  place-items: center;
+}
+.dapp-pl-back:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+.dapp-pl-cover {
+  box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+}
+.dapp-pl-headmeta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 8px;
+  min-width: 0;
+}
+.dapp-pl-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-base);
+}
+.dapp-pl-name {
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+  color: var(--text-base);
+  word-break: break-word;
+  /* size set inline via the nameSize tier so short titles get the giant treatment */
+}
+.dapp-pl-ownerline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-base);
+}
+.dapp-pl-ownerav {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--c-mauve);
+}
+.dapp-pl-owner {
+  font-weight: 700;
+}
+.dapp-pl-dot {
+  color: var(--text-subdued);
+}
+.dapp-pl-stats {
+  color: var(--text-subdued);
+}
+
+/* Toolbar gradient continues the hero tint into the page. */
+.dapp-pl-toolbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 32px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, var(--bg-base) 100%);
+}
+.dapp-pl-playbtn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--green-bright);
+  color: var(--text-on-green);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  flex-shrink: 0;
+  transition: transform 0.12s, background 0.12s;
+}
+.dapp-pl-playbtn:hover {
+  transform: scale(1.06);
+  background: var(--green-bright);
+}
+.dapp-pl-iconbtn {
+  color: var(--text-subdued);
+  padding: 4px;
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+}
+.dapp-pl-iconbtn:hover {
+  color: var(--text-base);
+}
+/* The +/✓ "save to library" affordance — Spotify wraps the glyph in a thin
+ * outlined circle when the playlist isn't saved, fills it green when it is. */
+.dapp-pl-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  outline: 1.5px solid currentColor;
+  outline-offset: -1.5px;
+  display: grid;
+  place-items: center;
+}
+.dapp-pl-morewrap {
+  position: relative;
+}
+.dapp-pl-morebtn[aria-expanded="true"] {
+  color: var(--text-base);
+}
+.dapp-pl-spacer {
+  flex: 1;
+}
+.dapp-pl-hint {
+  font-size: 12px;
+  color: var(--text-subdued);
+  font-style: italic;
+}
+.dapp-pl-listbtn {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-subdued);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: transparent;
+}
+.dapp-pl-listbtn:hover {
+  color: var(--text-base);
+}
+.dapp-pl-empty {
+  padding: 36px 32px;
+  text-align: center;
+  color: var(--text-subdued);
+  font-size: 13px;
+}
+.dapp-pl-empty strong {
+  color: var(--text-base);
+}
+
+/* The track table inside a playlist needs the page padding back since the
+ * .dapp-pl container bleeds. */
+.dapp-pl .dapp-tracktable {
+  margin: 0 24px;
+  width: calc(100% - 48px);
+}
+
+/* ⋯ popover variant — anchored to the More button via the .morewrap wrapper. */
+.dapp-popover--more {
+  top: 40px;
+  left: 0;
+  min-width: 260px;
+}
+
+/* Sticky banner shown over the browse workspace */
+.dapp-buildbanner {
+  position: sticky;
+  bottom: 16px;
+  margin: 24px auto 0;
+  padding: 10px 16px;
+  border-radius: var(--r-pill);
+  background: rgba(29, 185, 84, 0.16);
+  color: var(--text-base);
+  font-size: 12px;
+  width: fit-content;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  backdrop-filter: blur(4px);
+  outline: 1px solid rgba(29, 185, 84, 0.4);
+  outline-offset: -1px;
+}
+.dapp-buildbanner strong {
+  color: var(--green-bright);
+}
+.dapp-buildbanner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-bright);
+  box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.2);
+}
+
+/* ---- + Create popover (sidebar) ---- */
+.dapp-popover-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+}
+.dapp-create-wrap {
+  position: relative;
+}
+.dapp-popover {
+  position: absolute;
+  background: #232323;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-float);
+  padding: 6px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.dapp-popover--create {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  width: 288px;
+  z-index: 50;
+  animation: dapp-pop-in 0.14s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes dapp-pop-in {
+  from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.dapp-popover-row {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  background: transparent;
+  color: var(--text-base);
+}
+.dapp-popover-row:hover:not(:disabled) {
+  background: var(--tint-10);
+}
+.dapp-popover-row:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.dapp-popover-row.is-highlight {
+  background: rgba(29, 185, 84, 0.10);
+}
+.dapp-popover-row.is-highlight:hover {
+  background: rgba(29, 185, 84, 0.18);
+}
+.dapp-popover-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--tint-10);
+  display: grid;
+  place-items: center;
+}
+.dapp-popover-row.is-highlight .dapp-popover-icon {
+  background: var(--green-bright);
+  color: var(--text-on-green);
+}
+.dapp-popover-row-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+}
+.dapp-popover-row-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--text-subdued);
+  margin-top: 2px;
+}
+.dapp-popover-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: var(--green-bright);
+  color: var(--text-on-green);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  vertical-align: middle;
+}
+
+/* ---- Target picker modal ---- */
+.dapp-modal-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+}
+.dapp-modal {
+  width: min(520px, calc(100% - 48px));
+  max-height: calc(100% - 64px);
+  background: #1a1a1a;
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-float);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.dapp-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 22px 8px;
+}
+.dapp-modal-head h2 {
+  font-size: 22px;
+  font-weight: 800;
+}
+.dapp-modal-sub {
+  font-size: 13px;
+  color: var(--text-subdued);
+  margin-top: 6px;
+  max-width: 360px;
+}
+.dapp-modal-close {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  color: var(--text-subdued);
+  display: grid;
+  place-items: center;
+}
+.dapp-modal-close:hover {
+  color: var(--text-base);
+  background: var(--tint-10);
+}
+.dapp-target-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 360px;
+}
+.dapp-target-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  text-align: left;
+  background: transparent;
+}
+.dapp-target-row:hover {
+  background: var(--tint-07);
+}
+.dapp-target-row.is-on {
+  background: rgba(29, 185, 84, 0.10);
+}
+.dapp-target-name {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  font-weight: 600;
+  min-width: 0;
+}
+.dapp-target-meta {
+  font-size: 11px;
+  color: var(--text-subdued);
+  font-weight: 500;
+  margin-top: 2px;
+}
+.dapp-target-toggle {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--tint-10);
+  color: var(--text-base);
+}
+.dapp-target-row.is-on .dapp-target-toggle {
+  background: var(--green-bright);
+  color: var(--text-on-green);
+}
+.dapp-target-newbadge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--tint-10);
+  color: var(--text-base);
+  display: grid;
+  place-items: center;
+}
+.dapp-target-newinput {
+  margin: 6px 0 4px 48px;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  background: var(--bg-base);
+  outline: 1px solid var(--border-strong);
+  outline-offset: -1px;
+  color: var(--text-base);
+  font: inherit;
+  border: none;
+  width: calc(100% - 48px);
+}
+.dapp-target-newinput:focus {
+  outline-color: var(--green-bright);
+}
+.dapp-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px 18px;
+  border-top: 1px solid var(--border-subtle);
+}
+.dapp-modal-targetcount {
+  font-size: 12px;
+  color: var(--text-subdued);
+}
+.dapp-modal-actions {
+  display: flex;
+  gap: 8px;
+}
+
 /* ---- Player bar ---- */
 .dapp-player {
+  position: relative;        /* establish stacking context */
+  z-index: 5;                /* sits above the Build-Mode pill drawer (z-index 3)
+                              * so the drawer reads as rising from behind it */
   flex-shrink: 0;
   height: 80px;
   display: grid;

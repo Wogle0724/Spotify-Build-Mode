@@ -7,10 +7,17 @@
   align-items: flex-end;
   animation: addsheet-fade 0.18s ease;
 }
+.addsheet-scrim.is-closing {
+  animation: addsheet-fade-out 0.26s ease forwards;
+}
 
 @keyframes addsheet-fade {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+@keyframes addsheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .addsheet {
@@ -22,10 +29,17 @@
   box-shadow: var(--shadow-float);
   animation: addsheet-up 0.26s cubic-bezier(0.22, 1, 0.36, 1);
 }
+.addsheet.is-closing {
+  animation: addsheet-down 0.26s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
 
 @keyframes addsheet-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
+}
+@keyframes addsheet-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
 }
 
 .addsheet-grip {

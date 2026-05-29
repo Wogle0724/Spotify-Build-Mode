@@ -53,6 +53,31 @@
   --c-mauve: #503750;
   --c-slate: #477d95;
 
+  /* ---- Now Playing / transport ----
+   * The full-screen player. Spotify renders the transport icons in solid
+   * white (shuffle/repeat turn green only when toggled), a solid-white played
+   * scrubber with a draggable white thumb, and a translucent-white track for
+   * the unplayed remainder. (Known Spotify values — verify against Figma node
+   * 202:1667 when the MCP rate limit clears.) */
+  --player-icon: var(--text-base);            /* shuffle / prev / next / repeat at rest */
+  --scrubber-fill: var(--text-base);          /* played portion + thumb */
+  --scrubber-track: rgba(255, 255, 255, 0.3); /* unplayed remainder */
+
+  /* ---- Mini player ----
+   * Real Spotify renders the mini player bar as a dark surface tinted by the
+   * current album art, NOT a saturated brand color. We approximate that with a
+   * subtle dark tint so the bar reads as a player chrome, not a feature card. */
+  --miniplayer-bg: #232323;
+  --miniplayer-progress-track: rgba(255, 255, 255, 0.3);
+  --miniplayer-progress-fill: var(--text-base);
+
+  /* ---- Library filter chip ----
+   * Spotify's selected filter is solid green with black text; unselected is a
+   * dark translucent pill with white text. */
+  --pill-bg: #232323;
+  --pill-bg-active: var(--green-bright);
+  --pill-text-active: var(--text-on-green);
+
   /* ---- Radii / elevation ---- */
   --r-sm: 4px;
   --r-md: 8px;

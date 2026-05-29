@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { playlists as seedPlaylists, type Playlist } from '../../data/playlists'
 import { songs, songById, type Song } from '../../data/songs'
-import { formatDuration } from '../../lib/format'
 import { Artwork } from '../common/Artwork'
 import {
   HomeIcon,
@@ -13,11 +12,13 @@ import {
   MoreIcon,
   BackIcon,
   PlaylistIcon,
-  ShuffleIcon,
   DownloadIcon,
   ShareIcon,
   UsersIcon,
   SparkleIcon,
+  HeartIcon,
+  SortIcon,
+  GridViewIcon,
 } from '../icons'
 import { BuildMode } from './build-mode/BuildMode'
 import './MobileApp.css'
@@ -32,6 +33,12 @@ const NEW_PLAYLIST_COLORS = [
 interface MobileAppProps {
   /** Which bottom-nav tab to open on first render. */
   initialTab?: Tab
+  /**
+   * When true the app is being driven by the autoplay demo: Build Mode's voice
+   * toggle still flips to "on" visually, but real speech recognition is never
+   * started (no mic-permission prompt on the unattended landing page).
+   */
+  autoplay?: boolean
 }
 
 /**
@@ -42,7 +49,7 @@ interface MobileAppProps {
  * making the demo feel real. Build Mode renders as a full-screen layer over the
  * app via the `build` session state.
  */
-export function MobileApp({ initialTab = 'home' }: MobileAppProps) {
+export function MobileApp({ initialTab = 'home', autoplay = false }: MobileAppProps) {
   const [tab, setTab] = useState<Tab>(initialTab)
   const [openPlaylistId, setOpenPlaylistId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
@@ -140,20 +147,29 @@ export function MobileApp({ initialTab = 'home' }: MobileAppProps) {
         )}
       </div>
 
-      {/* Mini player */}
+      {/* Mini player — Spotify's chrome bar above the nav, NOT a brand-colored
+          feature card: dark surface, cover+meta on the left, actions
+          (Connect/Heart/Play) on the right, and a thin progress line that hugs
+          the bottom edge. */}
       <div className="mapp-miniplayer">
-        <Artwork color={nowPlaying.color} size={40} />
+        <Artwork color={nowPlaying.color} size={40} radius={4} />
         <div className="mapp-miniplayer-meta">
           <span className="mapp-miniplayer-title">{nowPlaying.title}</span>
           <span className="mapp-miniplayer-artist">{nowPlaying.artist}</span>
         </div>
+        <button className="mapp-miniplayer-btn" aria-label="Save to your Liked Songs">
+          <HeartIcon size={22} />
+        </button>
         <button
-          className="mapp-miniplayer-btn"
+          className="mapp-miniplayer-btn mapp-miniplayer-btn--play"
           onClick={() => setPlaying((p) => !p)}
           aria-label={playing ? 'Pause' : 'Play'}
         >
           {playing ? <PauseIcon size={22} /> : <PlayIcon size={22} />}
         </button>
+        <div className="mapp-miniplayer-progress" aria-hidden>
+          <span className="mapp-miniplayer-progress-fill" style={{ width: '38%' }} />
+        </div>
       </div>
 
       {/* Bottom nav */}
@@ -167,7 +183,7 @@ export function MobileApp({ initialTab = 'home' }: MobileAppProps) {
         <NavBtn label="Your Library" active={tab === 'library' && !openPlaylist} onClick={() => { setTab('library'); setOpenPlaylistId(null) }}>
           <LibraryIcon size={24} />
         </NavBtn>
-        <NavBtn label="Create" active={createOpen} onClick={() => setCreateOpen(true)}>
+        <NavBtn label="Create" active={createOpen} onClick={() => setCreateOpen(true)} dataDemo="nav-create">
           <PlusIcon size={26} />
         </NavBtn>
       </nav>
@@ -209,6 +225,7 @@ export function MobileApp({ initialTab = 'home' }: MobileAppProps) {
           onTogglePlaylist={toggleSongInPlaylist}
           onToggleLiked={toggleLiked}
           onExit={exitBuild}
+          disableMic={autoplay}
         />
       )}
     </div>
@@ -226,8 +243,15 @@ function HomeView({
 }) {
   return (
     <>
-      <header className="mapp-header">
-        <h1 className="mapp-greeting">Good evening</h1>
+      {/* Current Spotify dropped the "Good evening" greeting; Home now opens
+          with the user's avatar and a row of content-type filter chips. */}
+      <header className="mapp-homehead">
+        <span className="mapp-avatar-sm" aria-hidden />
+        <div className="mapp-homehead-chips no-scrollbar">
+          <span className="mapp-pill is-active">All</span>
+          <span className="mapp-pill">Music</span>
+          <span className="mapp-pill">Podcasts</span>
+        </div>
       </header>
       <div className="mapp-quickgrid">
         {playlists.slice(0, 6).map((p) => (
@@ -297,14 +321,27 @@ function LibraryView({
         <span className="mapp-pill">Albums</span>
       </div>
 
+      {/* Sort/view row — Spotify sits this between the filter chips and the
+          list. Left: current sort (defaults to "Recents") with a swap arrow;
+          right: a list/grid toggle. Static in this mock. */}
+      <div className="mapp-libsort">
+        <button className="mapp-libsort-btn" aria-label="Sort by Recents">
+          <SortIcon size={16} />
+          <span>Recents</span>
+        </button>
+        <button className="mapp-libsort-view" aria-label="Change view">
+          <GridViewIcon size={20} />
+        </button>
+      </div>
+
       <ul className="mapp-liblist">
         {playlists.map((p) => (
           <li key={p.id}>
-            <button className="mapp-librow" onClick={() => onOpen(p.id)}>
+            <button className="mapp-librow" onClick={() => onOpen(p.id)} data-demo="lib-row">
               <Artwork color={p.color} size={56} radius={6} />
               <div className="mapp-librow-meta">
                 <span className="mapp-librow-name">{p.name}</span>
-                <span className="mapp-librow-sub">Playlist · {p.songIds.length} songs</span>
+                <span className="mapp-librow-sub">Playlist · You</span>
               </div>
             </button>
           </li>
@@ -338,7 +375,7 @@ function PlaylistDetail({
         <div className="mapp-pl-topbar">
           <button onClick={onBack} aria-label="Back"><BackIcon size={24} /></button>
         </div>
-        <Artwork color={playlist.color} size={170} radius={6} className="mapp-pl-cover" />
+        <Artwork color={playlist.color} size={200} radius={6} className="mapp-pl-cover" />
       </div>
 
       {/* Left-aligned details: name, owner, stats, then the action row. */}
@@ -353,17 +390,21 @@ function PlaylistDetail({
 
         <p className="mapp-pl-stats">
           {playlist.songIds.length} {playlist.songIds.length === 1 ? 'song' : 'songs'}
-          {totalMs > 0 && <> · {formatTotalDuration(totalMs)}</>}
+          {totalMs > 0 && <>, {formatTotalDuration(totalMs)}</>}
         </p>
 
+        {/* Real Spotify playlist action row (per reference photo "Indie Pop"):
+            Heart + Download + ⋯ on the left, single green Play on the right.
+            Share lives inside the ⋯ menu, not in the action row, and Smart
+            Shuffle is integrated into the play button so there's no separate
+            shuffle icon anymore. */}
         <div className="mapp-pl-actionrow">
           <div className="mapp-pl-actions-left">
+            <button aria-label="Save to your library"><HeartIcon size={24} /></button>
             <button aria-label="Download"><DownloadIcon size={24} /></button>
-            <button aria-label="Share"><ShareIcon size={22} /></button>
-            <button aria-label="More options" onClick={onMenu}><MoreIcon size={24} /></button>
+            <button aria-label="More options" onClick={onMenu} data-demo="pl-more"><MoreIcon size={24} /></button>
           </div>
           <div className="mapp-pl-actions-right">
-            <button className="mapp-pl-shuffle" aria-label="Shuffle"><ShuffleIcon size={24} /></button>
             <button className="mapp-pl-play" aria-label="Play"><PlayIcon size={26} /></button>
           </div>
         </div>
@@ -375,7 +416,7 @@ function PlaylistDetail({
         )}
         {tracks.map((s) => (
           <li className="mapp-pl-track" key={s.id}>
-            <Artwork color={s.color} size={44} radius={4} />
+            <Artwork color={s.color} size={48} radius={4} />
             <div className="mapp-pl-track-meta">
               <span className="mapp-pl-track-title">{s.title}</span>
               <span className="mapp-pl-track-artist">
@@ -383,7 +424,13 @@ function PlaylistDetail({
                 {s.artist}
               </span>
             </div>
-            <span className="mapp-pl-track-dur">{formatDuration(s.durationMs)}</span>
+            {/* Real Spotify mobile shows ⋯ per row (not the duration). */}
+            <button
+              className="mapp-pl-track-more"
+              aria-label={`More options for ${s.title}`}
+            >
+              <MoreIcon size={20} />
+            </button>
           </li>
         ))}
       </ul>
@@ -439,6 +486,7 @@ function CreateMenu({
         title="Build Mode"
         sub="Rapidly add songs by tap or voice"
         onClick={onBuildMode}
+        dataDemo="create-buildmode"
       />
       <SheetRow
         icon={<PlaylistIcon size={22} />}
@@ -502,11 +550,12 @@ function PlaylistMenu({
         title="Enter Build Mode"
         sub="Add songs fast — tap or voice"
         onClick={onBuildMode}
+        dataDemo="pl-buildmode"
       />
       <SheetRow icon={<PlusIcon size={22} />} title="Add to this playlist" disabled />
       <SheetRow icon={<PlaylistIcon size={22} />} title="Edit playlist" disabled />
-      <SheetRow icon={<PlaylistIcon size={22} />} title="Download" disabled />
-      <SheetRow icon={<PlaylistIcon size={22} />} title="Share" disabled />
+      <SheetRow icon={<DownloadIcon size={22} />} title="Download" disabled />
+      <SheetRow icon={<ShareIcon size={22} />} title="Share" disabled />
     </Sheet>
   )
 }
@@ -535,12 +584,13 @@ function NamePrompt({
           maxLength={40}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && onConfirm(name)}
+          data-demo="name-input"
         />
         <div className="mapp-nameprompt-actions">
           <button className="mapp-nameprompt-cancel" onClick={onCancel}>
             Cancel
           </button>
-          <button className="mapp-nameprompt-create" onClick={() => onConfirm(name)}>
+          <button className="mapp-nameprompt-create" onClick={() => onConfirm(name)} data-demo="name-confirm">
             Start building
           </button>
         </div>
@@ -582,6 +632,7 @@ function SheetRow({
   highlight,
   disabled,
   onClick,
+  dataDemo,
 }: {
   icon: React.ReactNode
   title: string
@@ -590,12 +641,14 @@ function SheetRow({
   highlight?: boolean
   disabled?: boolean
   onClick?: () => void
+  dataDemo?: string
 }) {
   return (
     <button
       className={`mapp-sheet-row${highlight ? ' is-highlight' : ''}${disabled ? ' is-disabled' : ''}`}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
+      data-demo={dataDemo}
     >
       <span className={`mapp-sheet-row-icon${highlight ? ' is-highlight' : ''}`}>{icon}</span>
       <span className="mapp-sheet-row-text">
@@ -614,14 +667,20 @@ function NavBtn({
   label,
   active,
   onClick,
+  dataDemo,
 }: {
   children: React.ReactNode
   label: string
   active: boolean
   onClick: () => void
+  dataDemo?: string
 }) {
   return (
-    <button className={`mapp-navbtn${active ? ' is-active' : ''}`} onClick={onClick}>
+    <button
+      className={`mapp-navbtn${active ? ' is-active' : ''}`}
+      onClick={onClick}
+      data-demo={dataDemo}
+    >
       {children}
       <span>{label}</span>
     </button>

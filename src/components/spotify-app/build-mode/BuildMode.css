@@ -12,15 +12,26 @@
   padding: 54px 20px 26px;
 }
 
-/* ---- Header ---- */
+/* ---- Header ----
+ * The X (left) and "N added" chip (right) live on opposite sides; the
+ * eyebrow + playlist name in the middle must read as truly centered no matter
+ * which side is wider. Absolute-positioning the side controls keeps the
+ * center stack centered relative to the header itself, not to the gap
+ * between sides.
+ */
 .bm-header {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  justify-content: center;
+  min-height: 40px;
   margin-bottom: 6px;
 }
 .bm-header-btn {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -30,11 +41,14 @@
   background: var(--tint-10);
 }
 .bm-header-center {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  text-align: center;
   min-width: 0;
+  /* Make sure the centered stack never extends under the side controls. */
+  padding: 0 96px;
+  max-width: 100%;
 }
 .bm-header-eyebrow {
   font-size: 11px;
@@ -52,6 +66,10 @@
   text-overflow: ellipsis;
 }
 .bm-added-chip {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   font-size: 12px;
   font-weight: 700;
   color: var(--text-subdued);
@@ -122,16 +140,16 @@
 }
 .bm-title {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .bm-artist {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-subdued);
-  margin-top: 2px;
+  margin-top: 3px;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -145,25 +163,58 @@
   padding: 0 3px;
   line-height: 14px;
 }
-.bm-addmore {
+/* Right-edge heart button — matches Spotify Now Playing's heart affordance.
+ * Outlined/grey when not saved, green + filled when added to the playlist. */
+.bm-savebtn {
   flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: transparent;
   color: var(--text-subdued);
+  transition: transform 0.1s ease, color 0.12s;
 }
-.bm-addmore.is-added {
-  color: var(--green);
+.bm-savebtn:hover {
+  color: var(--text-base);
+  transform: scale(1.08);
+}
+.bm-savebtn:active {
+  transform: scale(0.92);
+}
+.bm-savebtn.is-added {
+  color: var(--green-bright);
+}
+.bm-savebtn.is-added svg {
+  fill: var(--green-bright);
+  stroke: var(--green-bright);
 }
 
 .bm-progress {
+  position: relative;
   width: 100%;
   height: 4px;
   border-radius: 2px;
-  background: var(--bg-card-hover);
-  overflow: hidden;
+  background: var(--scrubber-track);
 }
 .bm-progress-fill {
+  position: relative;
   height: 100%;
-  background: var(--text-base);
+  background: var(--scrubber-fill);
   border-radius: 2px;
+}
+/* White playhead thumb riding the right edge of the played portion. */
+.bm-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--scrubber-fill);
+  transform: translate(50%, -50%);
 }
 .bm-times {
   display: flex;
@@ -171,6 +222,7 @@
   font-size: 11px;
   color: var(--text-subdued);
   margin-top: -8px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Big action buttons (deciding) ---- */
@@ -207,30 +259,98 @@
 }
 
 /* ---- Transport (playing) ---- */
+/* Edge-to-edge like Spotify: shuffle/repeat sit at the scrubber's edges, the
+ * play button centers. min-height + margin-top mirror .bm-actions so the
+ * deciding↔playing control swap never shifts the layout above. */
 .bm-transport {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 24px;
+  justify-content: space-between;
+  padding: 0 4px;
   min-height: 120px;
   margin-top: 22px;
 }
 .bm-iconbtn {
-  color: var(--text-subdued);
+  color: var(--player-icon);
   display: grid;
   place-items: center;
+  transition: transform 0.1s ease;
+}
+.bm-iconbtn:active:not(:disabled) {
+  transform: scale(0.9);
 }
 .bm-iconbtn:disabled {
   opacity: 0.35;
 }
 .bm-playpause {
-  width: 64px;
-  height: 64px;
+  /* Smaller, tighter circle around the same-sized play/pause glyph — keeps
+   * the icon hierarchy but lets the transport row breathe. */
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--text-base);
   color: var(--black-true);
   display: grid;
   place-items: center;
+  transition: transform 0.1s ease;
+}
+.bm-playpause:active {
+  transform: scale(0.94);
+}
+
+/* Connect / Share / Queue row sitting directly under the transport. Matches
+ * the row Spotify shows on Now Playing — green "Listening on …" indicator on
+ * the left, share + queue icons on the right, smaller than transport icons. */
+.bm-belowtransport {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  margin-top: -8px;
+}
+.bm-connect {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--green-bright);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.bm-belowtransport-icons {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.bm-iconbtn--sm {
+  color: var(--text-subdued);
+}
+.bm-iconbtn--sm:active:not(:disabled) {
+  color: var(--text-base);
+}
+
+/* Shuffle / repeat toggles in the transport row. Subdued grey at rest, bright
+ * green with a small dot underneath when "on" — Spotify's pattern. */
+.bm-toggle {
+  position: relative;
+  color: var(--text-subdued);
+}
+.bm-toggle:active:not(:disabled) {
+  color: var(--text-base);
+}
+.bm-toggle.is-on {
+  color: var(--green-bright);
+}
+.bm-toggle.is-on::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--green-bright);
 }
 
 /* ---- Voice panel ---- */
@@ -311,29 +431,57 @@
 .bm-mode-list {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 2px;
 }
+/* Spotify-style list rows: icon swatch + text stack + chevron */
 .bm-mode-card {
   text-align: left;
-  padding: 20px;
-  border-radius: var(--r-lg);
-  background: var(--bg-card);
+  padding: 12px 10px;
+  border-radius: var(--r-md);
+  background: transparent;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  transition: background 0.15s ease, transform 0.1s ease;
+  align-items: center;
+  gap: 14px;
+  transition: background 0.12s ease;
+  color: var(--text-base);
 }
 .bm-mode-card:active {
-  transform: scale(0.99);
-  background: var(--bg-card-hover);
+  background: var(--tint-10);
+}
+.bm-mode-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.bm-mode-icon--known {
+  background: linear-gradient(135deg, #5038a0, #7c4dbe);
+}
+.bm-mode-icon--unknown {
+  background: linear-gradient(135deg, #1db954, #148040);
+}
+.bm-mode-icon--mix {
+  background: linear-gradient(135deg, #e8521a, #c03020);
+}
+.bm-mode-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 .bm-mode-title {
-  font-size: 19px;
-  font-weight: 800;
+  font-size: 16px;
+  font-weight: 700;
 }
 .bm-mode-blurb {
-  font-size: 13.5px;
+  font-size: 13px;
   color: var(--text-subdued);
+  line-height: 1.35;
+}
+.bm-mode-card > svg {
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 /* ---- Summary / done / exit confirm ---- */

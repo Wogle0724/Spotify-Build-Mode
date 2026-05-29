@@ -1,0 +1,140 @@
+/*
+ * Desktop demo overlay layer — arrow cursor, captions, fade, blocker.
+ * Mirrors DemoPhone.css but uses an arrow pointer instead of a touch dot.
+ */
+
+.ddemo-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.ddemo-blocker {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* Between-flow fade */
+.ddemo-fade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 675ms ease;
+  z-index: 40;
+}
+.ddemo-fade.is-on {
+  opacity: 1;
+}
+
+/* Arrow cursor */
+.ddemo-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 36;
+  opacity: 0;
+  transition:
+    transform 850ms cubic-bezier(0.33, 1, 0.68, 1),
+    opacity 200ms ease;
+}
+.ddemo-cursor.is-shown {
+  opacity: 1;
+}
+.ddemo-cursor-arrow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* hotspot at tip of arrow */
+  transform: translate(-2px, -2px);
+  transition: transform 90ms ease;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.55));
+}
+.ddemo-cursor.is-click .ddemo-cursor-arrow {
+  transform: translate(-2px, -2px) scale(0.85);
+}
+
+/* Click ripple */
+.ddemo-ripple {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  border: 2px solid var(--green-bright);
+  opacity: 0;
+  animation: ddemo-ripple 420ms ease-out;
+}
+@keyframes ddemo-ripple {
+  0% { opacity: 0.7; transform: scale(0.5); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+/* Caption */
+.ddemo-caption {
+  position: absolute;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 22px;
+  border-radius: var(--r-lg);
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.93);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  text-align: center;
+  z-index: 39;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  white-space: nowrap;
+}
+.ddemo-caption.is-visible {
+  opacity: 1;
+}
+.ddemo-caption--title {
+  bottom: auto;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  padding: 20px 32px;
+}
+.ddemo-caption-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.1;
+}
+.ddemo-caption-sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-subdued);
+  margin-top: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ddemo-cursor,
+  .ddemo-fade,
+  .ddemo-caption {
+    transition: none;
+    animation: none;
+  }
+}

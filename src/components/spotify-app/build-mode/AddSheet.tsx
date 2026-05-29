@@ -19,6 +19,8 @@ interface AddSheetProps {
   onToggleLiked: () => void
   /** Called when the sheet should close (timeout, Done, or backdrop). */
   onClose: () => void
+  /** When false, no countdown — the sheet only closes via Done/backdrop. */
+  autoDismiss?: boolean
 }
 
 /**
@@ -37,15 +39,19 @@ export function AddSheet({
   onTogglePlaylist,
   onToggleLiked,
   onClose,
+  autoDismiss = true,
 }: AddSheetProps) {
   const [resetToken, setResetToken] = useState(0)
+  const [closing, setClosing] = useState(false)
   const liked = likedSongIds.includes(song.id)
 
-  // (Re)arm the auto-dismiss whenever the user interacts.
+  // (Re)arm the auto-dismiss whenever the user interacts. When the timer
+  // expires we play the collapse animation, then onAnimationEnd calls onClose.
   useEffect(() => {
-    const id = window.setTimeout(onClose, AUTO_DISMISS_MS)
+    if (!autoDismiss || closing) return
+    const id = window.setTimeout(() => setClosing(true), AUTO_DISMISS_MS)
     return () => window.clearTimeout(id)
-  }, [resetToken, onClose])
+  }, [resetToken, autoDismiss, closing])
 
   const bump = () => setResetToken((t) => t + 1)
 
@@ -53,12 +59,18 @@ export function AddSheet({
   const others = playlists.filter((p) => p.id !== targetPlaylistId)
 
   return (
-    <div className="addsheet-scrim" onClick={onClose}>
+    <div
+      className={`addsheet-scrim${closing ? ' is-closing' : ''}`}
+      onClick={onClose}
+    >
       <div
-        className="addsheet"
+        className={`addsheet${closing ? ' is-closing' : ''}`}
         onClick={(e) => {
           e.stopPropagation()
           bump()
+        }}
+        onAnimationEnd={(e) => {
+          if (closing && e.animationName === 'addsheet-down') onClose()
         }}
       >
         <div className="addsheet-grip" />
@@ -77,6 +89,7 @@ export function AddSheet({
           {/* Liked Songs */}
           <button
             className="addsheet-row"
+            data-demo="sheet-liked"
             onClick={() => {
               onToggleLiked()
               bump()
@@ -111,6 +124,7 @@ export function AddSheet({
             <button
               key={p.id}
               className="addsheet-row"
+              data-demo="sheet-playlist"
               onClick={() => {
                 onTogglePlaylist(p.id)
                 bump()
@@ -123,14 +137,16 @@ export function AddSheet({
           ))}
         </div>
 
-        <button className="addsheet-done" onClick={onClose}>
+        <button className="addsheet-done" onClick={onClose} data-demo="sheet-done">
           Done
         </button>
 
         {/* Auto-dismiss countdown; restarts on each interaction via key. */}
-        <div className="addsheet-countdown">
-          <div key={resetToken} className="addsheet-countdown-fill" />
-        </div>
+        {autoDismiss && (
+          <div className="addsheet-countdown">
+            <div key={resetToken} className="addsheet-countdown-fill" />
+          </div>
+        )}
       </div>
     </div>
   )

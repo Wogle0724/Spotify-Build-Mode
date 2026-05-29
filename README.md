@@ -20,12 +20,21 @@ playlists dramatically faster. The site is the owner's PM proposal artifact — 
 explains the idea and lets a reviewer actually *play* with a working demo
 embedded in a faithful mock of the Spotify app.
 
+> **Design references live in [`design/README.md`](design/README.md)** — the
+> Figma file key + node IDs for every Spotify screen we mock, and how to pull
+> them via the Figma MCP server. Match those designs; don't invent UI.
+
 The product is pitched for **both** Spotify clients:
 
 - **Mobile** — add a song to a playlist with a single tap (or by voice). Designed
   to be usable hands-free, e.g. while driving.
-- **Desktop** — multi-select songs across the catalog, then **submit** to add
-  them all at once. *(Not built yet — see "Status".)*
+- **Desktop** — two siblings under one entry: **Build Mode** (browse-and-pick
+  across any playlist/album you can find — own library or external playlists
+  from Search) and **Build and Discover** (recommendations come up one at a
+  time; Add/Skip pill above the player bar; same 3 sub-modes as mobile —
+  known / unknown / mix). **Both modes keep the running added/selected
+  songs in the right sidebar** (the column that normally shows the queue or
+  song details).
 
 ## Status (read this first)
 
@@ -33,7 +42,7 @@ The product is pitched for **both** Spotify clients:
 | --- | --- |
 | Project skeleton (palette, device frames, dummy apps, dummy data, landing page) | ✅ Done |
 | **Mobile** Build Mode feature | ✅ Done |
-| **Desktop** Build Mode feature (multi-select + submit) | ⛔ Not started — `DesktopApp` is still just the dummy app shell with a `children` slot waiting for it |
+| **Desktop** Build Mode feature (Build Mode + Build and Discover, with sidebar) | 🟡 In progress — workspace + browse cart + discover pill landed; sidebar split being finished |
 | Real audio playback | ❌ Intentionally omitted (see Constraints) |
 
 ## Tech stack
@@ -63,6 +72,8 @@ the whole `src` tree. Run it after edits.
 ## Project structure
 
 ```
+design/
+└── README.md                   # Figma reference: file key + node IDs per screen
 src/
 ├── data/                       # dummy "backend" — edit catalog/playlists here
 │   ├── songs.ts                # 32 songs, each with a `genre`
@@ -115,6 +126,13 @@ The landing page (`App.tsx`) uses `useIsDesktop()` to switch layouts:
   Essentials", `p2` "2010s Pop Throwbacks". Keeping the catalog split this way
   lets a presenter build a single-genre playlist and show off the accept/skip
   moment (most picks fit, some don't).
+- **`externalPlaylists`** (also in `playlists.ts`) — "out on Spotify" playlists
+  that are **not** in the user's library but are discoverable via search. One
+  fabricated entry today: `ext-all-out-2000s` ("All Out 2000s", curated by
+  Spotify, 7.8M followers) pointing at all ten 2000s tracks in the discovery
+  pool. Intended for **desktop search only** — the desktop Build Mode flow lets
+  you pull up an existing internet playlist and cherry-pick songs out of it.
+  Use `searchExternalPlaylists(query)` to query; do not render on mobile.
 
 Artwork is never an image — it's `artworkGradient(color)`. Pick `color` from the
 `--c-*` tokens in `tokens.css`.
@@ -166,6 +184,49 @@ buttons so a recorded demo never breaks.
 songs added in Build Mode actually appear in the library afterward. An empty
 auto-created "New Playlist" is removed if the user exits without adding anything.
 
+## The Build Mode feature (desktop) — full spec
+
+**Two top-level modes** picked from the mode-select screen after a Build Mode
+session opens:
+
+1. **Build Mode** (browse-and-pick) — the user navigates Spotify normally
+   (Home / Search / any playlist or album from their library OR external
+   playlists surfaced by Search) and ticks songs they want. Multiple songs
+   across multiple sources accumulate in the right sidebar; one **Add**
+   commits the whole batch to the target playlist(s).
+2. **Build and Discover** — recommendations stream one at a time (same three
+   sub-modes as mobile: *known* / *unknown* / *mix*). A floating **Add/Skip
+   pill** sits directly above the player bar; Add opens a target chooser;
+   Skip moves to the next pick. The candidate song plays in the **regular
+   player bar** at the bottom of the app — no separate "now playing" UI —
+   and the user can keep browsing in the main area while a recommendation
+   plays.
+
+**Right sidebar in both modes.** The column that normally shows the queue or
+song details switches to showing the running added/selected songs:
+- *Build Mode* — pending selection (a cart), with Clear / Exit / **Add N**.
+- *Build and Discover* — songs already committed this session (a tally), with
+  an Exit button.
+
+**Main area** is always the normal Spotify desktop surfaces (Home / Search /
+Playlist detail / external playlist detail). In *Build Mode* the track rows
+sprout checkboxes; in *Build and Discover* the surfaces are exactly as they
+appear outside Build Mode.
+
+**Multi-target playlists.** Sessions can target multiple playlists at once.
+The TargetPicker modal at session start lets the user pick any combination of
+their library plus an optional fresh playlist; the Add/Commit popups let them
+fan-out per batch.
+
+**State ownership:** `DesktopApp` owns the mutable `pls` + `liked` library
+state and a `build: BuildSession | null` slot. `BuildSession` carries the
+chosen targets, freshly-created playlist IDs (for GC on exit), the picked
+`kind`, and a snapshot of the targets' songs at session start (so the sidebar
+can compute "added this session" without polluting itself with songs that
+were already in the targets). The Discover controller (`DesktopDiscoverWorkspace`)
+owns only queue/index/elapsed/paused state; the sidebar reads added-this-session
+from `playlists` minus the session snapshot.
+
 ## Key product decisions (already settled — don't re-litigate without the owner)
 
 - Stack: React + Vite + TS. Theme: Spotify **dark** (#121212/#000 + #1DB954).
@@ -208,4 +269,8 @@ auto-created "New Playlist" is removed if the user exits without adding anything
    "Submit" button that batch-adds. `DesktopApp` already accepts a `children`
    slot and the `DemoOverlay` desktop path is wired; the recommendation logic in
    `buildMode.ts` is platform-agnostic and reusable.
-2. Ongoing mobile-mock alignment/styling polish.
+2. **Desktop search bar wiring** — surface `externalPlaylists` (via
+   `searchExternalPlaylists`) as a result type alongside songs, so you can open
+   "All Out 2000s" and stage songs out of it in Build Mode. Data layer is
+   ready; only the UI is missing. Keep this off mobile.
+3. Ongoing mobile-mock alignment/styling polish.

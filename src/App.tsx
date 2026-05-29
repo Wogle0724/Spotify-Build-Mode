@@ -1,16 +1,34 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useIsDesktop } from './lib/useMediaQuery'
-import { PhoneFrame } from './components/devices/PhoneFrame'
-import { DesktopFrame } from './components/devices/DesktopFrame'
-import { MobileApp } from './components/spotify-app/MobileApp'
-import { DesktopApp } from './components/spotify-app/DesktopApp'
+import { DemoPhone } from './components/demo-autoplay/DemoPhone'
+import { DemoDesktop } from './components/demo-autoplay/DemoDesktop'
 import { DemoOverlay, type Platform } from './components/DemoOverlay'
-import { SpotifyLogo } from './components/icons'
+import { SpotifyLogo, LinkedInIcon } from './components/icons'
 import './App.css'
 
 export default function App() {
   const isDesktop = useIsDesktop()
   const [demo, setDemo] = useState<Platform | null>(null)
+
+  function openDemo(platform: Platform) {
+    window.history.pushState({ demo: platform }, '')
+    setDemo(platform)
+  }
+  function closeDemo() {
+    setDemo(null)
+  }
+
+  useEffect(() => {
+    const onPop = () => setDemo(null)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
+
+  // Lock body scroll when overlay is open to prevent scrollbar-width layout shift.
+  useEffect(() => {
+    document.body.style.overflow = demo ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [demo])
 
   return (
     <div className="page">
@@ -26,30 +44,24 @@ export default function App() {
                 kind="mobile"
                 caption="On mobile — one tap to add"
                 blurb="Find a song, tap once, it's in the playlist. Or just say it out loud."
-                onTry={() => setDemo('mobile')}
+                onTry={() => openDemo('mobile')}
               >
-                <PhoneFrame width={260}>
-                  <MobileApp initialTab="library" />
-                </PhoneFrame>
+                <DemoPhone width={260} />
               </DemoColumn>
 
               <DemoColumn
                 kind="desktop"
                 caption="On desktop — select, then submit"
                 blurb="Cherry-pick songs across the catalog, then add them all in one click."
-                onTry={() => setDemo('desktop')}
+                onTry={() => openDemo('desktop')}
               >
-                <DesktopFrame width={620}>
-                  <DesktopApp />
-                </DesktopFrame>
+                <DemoDesktop width={620} />
               </DemoColumn>
             </div>
           ) : (
             <div className="showcase-mobile">
-              <PhoneFrame width={300}>
-                <MobileApp initialTab="library" />
-              </PhoneFrame>
-              <button className="cta-primary" onClick={() => setDemo('mobile')}>
+              <DemoPhone width={300} />
+              <button className="cta-primary" onClick={() => openDemo('mobile')}>
                 Try it yourself
               </button>
               <p className="showcase-hint">
@@ -62,7 +74,7 @@ export default function App() {
 
       <SiteFooter />
 
-      {demo && <DemoOverlay platform={demo} onClose={() => setDemo(null)} />}
+      {demo && <DemoOverlay platform={demo} onClose={closeDemo} />}
     </div>
   )
 }
@@ -73,11 +85,29 @@ function SiteHeader() {
       <div className="brand">
         <SpotifyLogo size={28} />
         <span className="brand-name">Build Mode</span>
-        <span className="brand-tag">Product concept</span>
+        <span className="brand-tag">Spotify Product concept</span>
       </div>
-      <a className="header-link" href="#demo">
-        See the demo
-      </a>
+      <div className="header-actions">
+        {/* TODO: replace href with your LinkedIn profile URL */}
+        <a
+          className="header-link header-link--linkedin"
+          href="https://linkedin.com/in/YOUR_PROFILE_HERE"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <LinkedInIcon size={16} />
+          LinkedIn
+        </a>
+        {/* TODO: replace href with your write-up URL (PDF, Notion, etc.) */}
+        <a
+          className="header-link header-link--writeup"
+          href="#writeup-placeholder"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Write-up ↗
+        </a>
+      </div>
     </header>
   )
 }

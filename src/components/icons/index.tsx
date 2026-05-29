@@ -58,9 +58,21 @@ export const PauseIcon = ({ size = 24, ...p }: IconProps) => (
   </svg>
 )
 
+// Heart — Material-style symmetric path, designed to read well both as an
+// outlined glyph (default `fill="none" stroke=currentColor`) and as a filled
+// glyph when the wrapper sets `fill: currentColor`. We render outlined by
+// default; callers that want the filled "liked" treatment add `.is-on` /
+// matching CSS to flip fill+stroke to the brand green.
 export const HeartIcon = ({ size = 24, ...p }: IconProps) => (
-  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={2} {...p}>
-    <path d="M12 20s-7-4.5-9.5-9C1 8 2.5 4.5 6 4.5c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.5 0 5 3.5 3.5 6.5C19 15.5 12 20 12 20Z" />
+  <svg
+    {...base(size)}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinejoin="round"
+    {...p}
+  >
+    <path d="M12 21.05 10.55 19.74C5.4 15.09 2 12.04 2 8.27 2 5.2 4.42 2.8 7.5 2.8c1.74 0 3.41.81 4.5 2.09C13.09 3.61 14.76 2.8 16.5 2.8 19.58 2.8 22 5.2 22 8.27c0 3.77-3.4 6.82-8.55 11.47L12 21.05Z" />
   </svg>
 )
 
@@ -110,8 +122,8 @@ export const MoreIcon = ({ size = 24, ...p }: IconProps) => (
 )
 
 export const BackIcon = ({ size = 24, ...p }: IconProps) => (
-  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={2.2} {...p}>
-    <path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.9} {...p}>
+    <path d="M14.5 6 8 12l6.5 6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
@@ -121,10 +133,14 @@ export const PlaylistIcon = ({ size = 24, ...p }: IconProps) => (
   </svg>
 )
 
+// Repeat — single circular arrow with one arrowhead. Reads as "loop" at a
+// glance. Use the wrapper's `.is-on` to recolor green + show the underdot.
 export const RepeatIcon = ({ size = 24, ...p }: IconProps) => (
-  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.9} {...p}>
-    <path d="M7 7h9a3 3 0 0 1 3 3v1M17 17H8a3 3 0 0 1-3-3v-1" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M16 4.5 19 7l-3 2.5M8 19.5 5 17l3-2.5" strokeLinecap="round" strokeLinejoin="round" />
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.8} {...p}>
+    {/* Almost-closed circle: starts at ~2 o'clock, sweeps clockwise back to ~1 o'clock */}
+    <path d="M16 6.5a7 7 0 1 0 4 6.3" strokeLinecap="round" />
+    {/* Arrowhead capping the open end at the top */}
+    <path d="m13 3.5 3.5 3-3.5 3" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
@@ -134,10 +150,12 @@ export const DownloadIcon = ({ size = 24, ...p }: IconProps) => (
   </svg>
 )
 
+// Share — outbox-style arrow rising from a tray. Spotify's mobile Now Playing
+// uses an arrow-out-of-box icon to the left of the queue button.
 export const ShareIcon = ({ size = 24, ...p }: IconProps) => (
-  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.9} {...p}>
-    <path d="M12 15V4M8.5 7.5 12 4l3.5 3.5" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1" strokeLinecap="round" strokeLinejoin="round" />
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.8} {...p}>
+    <path d="M12 14V3.5M8.5 7 12 3.5 15.5 7" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 )
 
@@ -152,6 +170,62 @@ export const UsersIcon = ({ size = 24, ...p }: IconProps) => (
 export const SparkleIcon = ({ size = 24, ...p }: IconProps) => (
   <svg {...base(size)} {...p}>
     <path d="M12 2.5l1.8 5.2 5.2 1.8-5.2 1.8L12 16.5l-1.8-5.2L5 9.5l5.2-1.8L12 2.5zM18.5 15l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9.9-2.6z" />
+  </svg>
+)
+
+// Two-arrow "sort" indicator used next to "Recents" in the library header.
+export const SortIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.9} {...p}>
+    <path d="M7 5v14M4 8l3-3 3 3M17 5v14M14 16l3 3 3-3" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+// Connect to a device — clean boombox/speaker silhouette. Matches the icon
+// Spotify uses below the transport in mobile Now Playing and on the desktop
+// player's right side.
+export const ConnectIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.8} {...p}>
+    <rect x="5" y="3.5" width="14" height="17" rx="2.2" />
+    <circle cx="12" cy="15" r="2.6" fill="currentColor" stroke="none" />
+    <path d="M9 7.5h6" strokeLinecap="round" />
+  </svg>
+)
+
+// Queue — three stacked lines (a list) with a small play triangle nearby,
+// matching Spotify's "Queue" glyph in the Now Playing bottom row.
+export const QueueIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.8} {...p}>
+    <path d="M3 7h13M3 12h13M3 17h7" strokeLinecap="round" />
+    <path d="M14 15.5v5l4-2.5z" fill="currentColor" stroke="none" />
+  </svg>
+)
+
+// 2×2 grid: the list/grid view toggle on the right of the library sort row.
+export const GridViewIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <rect x="4" y="4" width="7" height="7" rx="1" />
+    <rect x="13" y="4" width="7" height="7" rx="1" />
+    <rect x="4" y="13" width="7" height="7" rx="1" />
+    <rect x="13" y="13" width="7" height="7" rx="1" />
+  </svg>
+)
+
+export const ChevronRightIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.9} {...p}>
+    <path d="M9.5 6 16 12l-6.5 6" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const ChevronDownIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} fill="none" stroke="currentColor" strokeWidth={1.9} {...p}>
+    <path d="M6 9.5 12 16l6-6.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+)
+
+export const LinkedInIcon = ({ size = 24, ...p }: IconProps) => (
+  <svg {...base(size)} {...p}>
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z" />
+    <circle cx="4" cy="4" r="2" />
   </svg>
 )
 

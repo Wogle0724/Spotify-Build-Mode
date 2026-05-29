@@ -3,6 +3,7 @@ import { PhoneFrame, PHONE_FRAME } from './devices/PhoneFrame'
 import { DesktopFrame, DESKTOP_FRAME } from './devices/DesktopFrame'
 import { MobileApp } from './spotify-app/MobileApp'
 import { DesktopApp } from './spotify-app/DesktopApp'
+import { LinkedInIcon } from './icons'
 import './DemoOverlay.css'
 
 export type Platform = 'mobile' | 'desktop'
@@ -27,20 +28,46 @@ export function DemoOverlay({ platform, onClose }: DemoOverlayProps) {
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  function handleBack() {
+    // If there's a history entry we pushed, go back (triggers popstate → onClose).
+    // Otherwise close directly.
+    if (window.history.state?.demo) {
+      window.history.back()
+    } else {
+      onClose()
+    }
+  }
+
   return (
     <div className="demo-overlay" role="dialog" aria-modal="true">
       <div className="demo-overlay-bar">
-        <button className="demo-back" onClick={onClose}>
-          ← Back
+        <button className="demo-back" onClick={handleBack}>
+          Back
         </button>
         <span className="demo-overlay-title">
-          Build Mode · {platform === 'mobile' ? 'Mobile' : 'Desktop'} demo
+          Build Mode &middot; {platform === 'mobile' ? 'Mobile' : 'Desktop'} demo
         </span>
-        <span className="demo-overlay-note">
-          {platform === 'mobile'
-            ? 'Live · tap ＋ or a playlist’s ⋯ to enter Build Mode'
-            : 'Desktop flow coming next'}
-        </span>
+        <div className="demo-overlay-links">
+          {/* TODO: replace href with your LinkedIn profile URL */}
+          <a
+            className="header-link header-link--linkedin"
+            href="https://linkedin.com/in/YOUR_PROFILE_HERE"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <LinkedInIcon size={16} />
+            LinkedIn
+          </a>
+          {/* TODO: replace href with your write-up URL */}
+          <a
+            className="header-link header-link--writeup"
+            href="#writeup-placeholder"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Write-up ↗
+          </a>
+        </div>
       </div>
 
       <div className="demo-overlay-stage">

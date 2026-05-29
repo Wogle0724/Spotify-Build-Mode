@@ -1,0 +1,8 @@
+- Make the choice on mobile between the three tiers of build mode look more like Spotify's actual UI. 
+- At the top right corner, instead of "See the demo" and whatever replaces it, have a place for my LinkedIn and a write-up of the product (I'll fill in the images and links later but make it obvious where the placeholders are)
+- Make the demo video for desktop. Use a pointer/cursor instead of the finger and go through all of the possible flows. 
+- Make the songs actually play from the start in desktop. also, make the pause, back, skip buttons work in the playbar
+- Where there are arrows, such as next to the back button, use a more aesthetic arrow. Also, the one you're currently using is shifted too low. 
+- On desktop, make it so the user can un-add songs that are in the added queue. 
+- Look at spotify-ui/mobile-ui.svg to get the mobile ui. implement that ui where applicable
+- Look at spotify-ui/desktop-ui.svg to get the desktop ui and implement where applicable

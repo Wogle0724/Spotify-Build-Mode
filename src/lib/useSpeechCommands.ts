@@ -29,7 +29,7 @@ function getRecognitionCtor(): SpeechRecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null
 }
 
-const ADD_RE = /\b(add|yes|keep|save|like)\b/
+const ADD_RE = /\b(add|ad|yes|keep|save|like)\b/
 const SKIP_RE = /\b(skip|next|no|pass|reject)\b/
 
 function classify(transcript: string): VoiceCommand | null {

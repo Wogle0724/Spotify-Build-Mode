@@ -12,13 +12,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 0 24px;
+  height: 72px;
   position: sticky;
   top: 0;
   z-index: 20;
   backdrop-filter: blur(12px);
   background: rgba(18, 18, 18, 0.6);
   border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 .brand {
   display: flex;
@@ -43,13 +45,39 @@
   padding: 3px 8px;
   border-radius: var(--r-pill);
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .header-link {
   font-weight: 700;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-subdued);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  height: 36px;
+  border-radius: var(--r-pill);
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .header-link:hover {
   color: var(--text-base);
+  background: var(--tint-07);
+}
+.header-link--linkedin {
+  border: 1px solid var(--border-subtle);
+}
+.header-link--writeup {
+  background: var(--green);
+  color: var(--text-on-green);
+}
+.header-link--writeup:hover {
+  background: var(--green-bright);
+  color: var(--text-on-green);
 }
 
 /* ---- Hero ---- */
