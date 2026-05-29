@@ -183,6 +183,45 @@
   margin-top: -6px;
 }
 
+/* The "LinkedIn" text label next to the icon (hidden on phones). */
+.header-link-label {
+  display: inline;
+}
+
+/* ---- Phone view ----
+ * When the site is opened on a phone, trim the header to the essentials:
+ * drop the concept pill so "Build Mode" owns the space, enlarge the logo,
+ * reduce LinkedIn to just its icon, and keep the Write-up off the edge. */
+@media (max-width: 640px) {
+  .site-header {
+    padding: 0 16px;
+  }
+  /* Bigger Spotify mark. */
+  .brand svg {
+    width: 36px;
+    height: 36px;
+  }
+  /* "Build Mode" takes the freed space. */
+  .brand-name {
+    font-size: 22px;
+  }
+  /* Hide the "Spotify Product concept" pill. */
+  .brand-tag {
+    display: none;
+  }
+  /* LinkedIn becomes an icon-only button. */
+  .header-link-label {
+    display: none;
+  }
+  .header-link--linkedin {
+    padding: 0 10px;
+  }
+  /* Keep the Write-up button from pressing against the screen edge. */
+  .header-link--writeup {
+    margin-right: 4px;
+  }
+}
+
 /* ---- Footer ---- */
 .site-footer {
   margin-top: auto;

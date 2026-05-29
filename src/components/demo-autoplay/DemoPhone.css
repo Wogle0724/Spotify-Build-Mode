@@ -106,23 +106,18 @@
 .demo-caption {
   position: absolute;
   bottom: 96px;
-  left: 18px;
-  right: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* Box hugs its text instead of spanning the screen. */
+  width: fit-content;
+  max-width: calc(100% - 36px);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 9px;
   padding: 14px 22px;
   border-radius: var(--r-lg);
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.06),
-    0 8px 28px rgba(0, 0, 0, 0.55),
-    0 2px 6px rgba(0, 0, 0, 0.4);
-  color: rgba(255, 255, 255, 0.94);
+  color: rgba(255, 255, 255, 0.96);
   font-size: 16px;
   font-weight: 700;
   letter-spacing: -0.2px;
@@ -133,6 +128,17 @@
   opacity: 0;
   transition: opacity 280ms ease;
 }
+/* Backing plate, blurred so the edge feathers softly while the text stays
+ * crisp on top. Sits just behind the caption's own content. */
+.demo-caption::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: rgba(0, 0, 0, 0.64);
+  filter: blur(7px);
+}
 .demo-caption.is-visible {
   opacity: 1;
 }
@@ -141,11 +147,11 @@
 .demo-caption--voice {
   gap: 12px;
   padding: 14px 24px;
-  background: rgba(29, 185, 84, 0.16);
-  border-color: rgba(30, 215, 96, 0.4);
   color: var(--green-bright);
   font-size: 19px;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4);
+}
+.demo-caption--voice::before {
+  background: rgba(29, 185, 84, 0.34);
 }
 
 /* Animated equalizer bars that signal "sound / listening". */

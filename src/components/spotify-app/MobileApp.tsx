@@ -458,7 +458,7 @@ function SearchView() {
         <SearchIcon size={20} />
         <span>What do you want to listen to?</span>
       </div>
-      <p className="mapp-search-hint">Browse all — coming soon in this mock.</p>
+      <p className="mapp-search-hint">Browse not included in this mock.</p>
     </>
   )
 }

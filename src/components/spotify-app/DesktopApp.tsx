@@ -410,8 +410,6 @@ export function DesktopApp({ children }: DesktopAppProps) {
           ) : (
             <HomeView pls={pls} onOpen={(id) => setOpenPlaylistId(id)} />
           )}
-
-          {build && inBrowse && <BrowseBanner targets={pls.filter((p) => build.defaultTargetIds.includes(p.id))} />}
         </>
       )}
 
@@ -1078,22 +1076,6 @@ function SelectableTrackList({
         })}
       </tbody>
     </table>
-  )
-}
-
-/** A sticky banner shown over the browse workspace so the user always sees
- *  which playlist(s) their batch is heading into. */
-function BrowseBanner({ targets }: { targets: Playlist[] }) {
-  if (targets.length === 0) return null
-  const label =
-    targets.length === 1
-      ? targets[0].name
-      : `${targets[0].name} + ${targets.length - 1} more`
-  return (
-    <div className="dapp-buildbanner" role="status">
-      <span className="dapp-buildbanner-dot" />
-      Building <strong>{label}</strong> — tick songs to add them to your batch.
-    </div>
   )
 }
 

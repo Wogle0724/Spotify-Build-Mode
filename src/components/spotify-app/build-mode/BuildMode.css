@@ -395,9 +395,56 @@
   font-size: 12.5px;
   color: var(--text-subdued);
 }
-.bm-voice-hint em {
+
+/* Live voice feedback: the "say this" prompt over a distinct "heard that" row,
+ * so it's always clear what to say and what the mic actually picked up. */
+.bm-voice-live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+.bm-voice-prompt {
+  font-size: 12.5px;
+  color: var(--text-subdued);
+}
+.bm-voice-prompt strong {
   color: var(--text-base);
-  font-style: normal;
+  font-weight: 800;
+}
+.bm-voice-listening {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--green-bright);
+}
+.bm-voice-heard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: var(--r-pill);
+  background: var(--green-tint);
+  border: 1px solid var(--green);
+}
+.bm-voice-heard-label {
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--green-bright);
+}
+.bm-voice-heard-text {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-base);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .bm-voice-sim-btns {
   display: flex;

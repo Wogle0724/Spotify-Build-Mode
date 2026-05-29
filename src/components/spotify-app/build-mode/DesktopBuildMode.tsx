@@ -207,6 +207,14 @@ export function BrowseCart({
   const [confirmAddOpen, setConfirmAddOpen] = useState(false)
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false)
 
+  const targets = playlists.filter((p) => defaultTargetIds.includes(p.id))
+  const targetLabel =
+    targets.length === 0
+      ? 'your playlist'
+      : targets.length === 1
+        ? targets[0].name
+        : `${targets[0].name} + ${targets.length - 1} more`
+
   const handleExit = () => {
     if (items.length === 0) {
       onCancel()
@@ -217,6 +225,13 @@ export function BrowseCart({
 
   return (
     <aside className="dbm-cart">
+      <div className="dbm-cart-target" role="status" title={`Adding to: ${targetLabel}`}>
+        <span className="dbm-cart-target-dot" />
+        <span className="dbm-cart-target-label">
+          Adding to <strong>{targetLabel}</strong>
+        </span>
+      </div>
+
       <header className="dbm-cart-head">
         <span className="dbm-cart-count">
           {items.length === 0 ? 'Nothing selected' : `${items.length} selected`}

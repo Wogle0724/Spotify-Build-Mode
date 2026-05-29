@@ -295,8 +295,8 @@
   position: absolute;
   right: 18px;
   bottom: 78px;
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--green);
   color: var(--text-on-green);
@@ -512,8 +512,8 @@
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, var(--bg-base) 100%);
 }
 .dapp-pl-playbtn {
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: var(--green-bright);
   color: var(--text-on-green);
@@ -597,36 +597,6 @@
   top: 40px;
   left: 0;
   min-width: 260px;
-}
-
-/* Sticky banner shown over the browse workspace */
-.dapp-buildbanner {
-  position: sticky;
-  bottom: 16px;
-  margin: 24px auto 0;
-  padding: 10px 16px;
-  border-radius: var(--r-pill);
-  background: rgba(29, 185, 84, 0.16);
-  color: var(--text-base);
-  font-size: 12px;
-  width: fit-content;
-  max-width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  backdrop-filter: blur(4px);
-  outline: 1px solid rgba(29, 185, 84, 0.4);
-  outline-offset: -1px;
-}
-.dapp-buildbanner strong {
-  color: var(--green-bright);
-}
-.dapp-buildbanner-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--green-bright);
-  box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.2);
 }
 
 /* ---- + Create popover (sidebar) ---- */

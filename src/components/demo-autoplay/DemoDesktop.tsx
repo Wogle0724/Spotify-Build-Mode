@@ -14,7 +14,7 @@ import './DemoDesktop.css'
  */
 
 const SCREEN_W = 1200
-const CURSOR_MOVE_MS = 850
+const CURSOR_MOVE_MS = 450
 
 class Cancelled extends Error {}
 

@@ -3,6 +3,7 @@ import { PhoneFrame, PHONE_FRAME } from './devices/PhoneFrame'
 import { DesktopFrame, DESKTOP_FRAME } from './devices/DesktopFrame'
 import { MobileApp } from './spotify-app/MobileApp'
 import { DesktopApp } from './spotify-app/DesktopApp'
+import { GuidedCoach } from './GuidedCoach'
 import { LinkedInIcon } from './icons'
 import './DemoOverlay.css'
 
@@ -51,12 +52,12 @@ export function DemoOverlay({ platform, onClose }: DemoOverlayProps) {
           {/* TODO: replace href with your LinkedIn profile URL */}
           <a
             className="header-link header-link--linkedin"
-            href="https://linkedin.com/in/YOUR_PROFILE_HERE"
+            href="https://www.linkedin.com/in/wyattogle28"
             target="_blank"
             rel="noopener noreferrer"
           >
             <LinkedInIcon size={16} />
-            LinkedIn
+            <span className="header-link-label">LinkedIn</span>
           </a>
           {/* TODO: replace href with your write-up URL */}
           <a
@@ -74,6 +75,7 @@ export function DemoOverlay({ platform, onClose }: DemoOverlayProps) {
         {platform === 'mobile' ? (
           <PhoneFrame width={width}>
             <MobileApp initialTab="library" />
+            <GuidedCoach />
           </PhoneFrame>
         ) : (
           <DesktopFrame width={width}>

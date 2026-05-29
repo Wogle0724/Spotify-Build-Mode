@@ -145,6 +145,39 @@
   padding: 14px 0 12px;
   min-height: 0;
 }
+/* Target tracker pinned to the top of the queue — always shows which
+ * playlist(s) the batch is heading into (replaces the old workspace banner). */
+.dbm-cart-target {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 12px;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  background: rgba(29, 185, 84, 0.14);
+  outline: 1px solid rgba(29, 185, 84, 0.34);
+  outline-offset: -1px;
+  font-size: 12px;
+  color: var(--text-base);
+}
+.dbm-cart-target strong {
+  color: var(--green-bright);
+  font-weight: 800;
+}
+.dbm-cart-target-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-bright);
+  box-shadow: 0 0 0 4px rgba(29, 185, 84, 0.2);
+}
+.dbm-cart-target-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .dbm-cart-head {
   display: flex;
   align-items: center;

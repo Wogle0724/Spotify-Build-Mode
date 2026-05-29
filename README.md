@@ -1,12 +1,3 @@
-Adding Figma Files:
-claude --resume 0e29be53-93d3-4ed2-8a2c-ec76d9c3fb45
-
-Main UI Creation:
-claude --resume 6357377a-0b64-4d10-b876-5a7b0b958368
-
-Making Demo Videos:
-claude --resume c88d5bd6-806c-41bf-af3f-4785c35b5cb9
-
 # Spotify · Build Mode — Product Pitch Site
 
 > **For future Claude sessions:** this README is the source of truth for project

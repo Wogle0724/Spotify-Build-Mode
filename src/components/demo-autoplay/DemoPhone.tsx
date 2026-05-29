@@ -102,10 +102,10 @@ export function DemoPhone({ width }: { width: number }) {
 
     const tap = async (el: HTMLElement) => {
       await glideTo(el)
-      await sleep(300)
+      await sleep(90)
       setPressing(true)
       setRippleKey((k) => k + 1)
-      await sleep(188)
+      await sleep(90)
       el.click()
       setPressing(false)
       await sleep(600)

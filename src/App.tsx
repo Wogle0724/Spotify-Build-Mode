@@ -52,7 +52,7 @@ export default function App() {
               <DemoColumn
                 kind="desktop"
                 caption="On desktop — select, then submit"
-                blurb="Cherry-pick songs across the catalog, then add them all in one click."
+                blurb="Cherry-pick songs across the app, then add them all in one click."
                 onTry={() => openDemo('desktop')}
               >
                 <DemoDesktop width={620} />
@@ -91,12 +91,12 @@ function SiteHeader() {
         {/* TODO: replace href with your LinkedIn profile URL */}
         <a
           className="header-link header-link--linkedin"
-          href="https://linkedin.com/in/YOUR_PROFILE_HERE"
+          href="https://www.linkedin.com/in/wyattogle28"
           target="_blank"
           rel="noopener noreferrer"
         >
           <LinkedInIcon size={16} />
-          LinkedIn
+          <span className="header-link-label">LinkedIn</span>
         </a>
         {/* TODO: replace href with your write-up URL (PDF, Notion, etc.) */}
         <a
@@ -121,7 +121,7 @@ function Hero() {
         <span className="hero-accent"> speed of thought.</span>
       </h1>
       <p className="hero-sub">
-        Build Mode makes adding songs effortless — a single tap or your voice on
+        Build Mode makes finding and adding songs effortless — a single tap or your voice on
         mobile, and batch-select-then-submit on desktop. Same idea, tuned to each
         device.
       </p>

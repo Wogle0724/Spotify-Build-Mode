@@ -547,10 +547,22 @@ function VoicePanel({
       {voiceOn && (
         <div className="bm-voice-body">
           {realActive ? (
-            <span className="bm-voice-hint">
-              Listening — say “Spotify, add” or “Spotify, skip”.
-              {transcript && <em> “{transcript}”</em>}
-            </span>
+            <div className="bm-voice-live">
+              <p className="bm-voice-prompt">
+                Say <strong>“Spotify, add”</strong> or <strong>“Spotify, skip”</strong>
+              </p>
+              {transcript.trim() ? (
+                <p className="bm-voice-heard">
+                  <span className="bm-voice-heard-label">Heard</span>
+                  <span className="bm-voice-heard-text">“{transcript.trim()}”</span>
+                </p>
+              ) : (
+                <p className="bm-voice-listening">
+                  <span className="bm-voice-dot" />
+                  Listening…
+                </p>
+              )}
+            </div>
           ) : (
             <div className="bm-voice-sim">
               <span className="bm-voice-hint">
